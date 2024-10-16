@@ -5,3 +5,5 @@ build/
 *.iws
 *.iml
 *.ipr
+/.coursecreator/
+*/build/

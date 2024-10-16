@@ -1,9 +1,11 @@
 type: edu
 files:
-  - name: src/Excercise1.java
+  - name: src/Task.java
     visible: true
   - name: test/CourseTests.java
     visible: false
     propagatable: false
+  - name: src/domain/articles/Article.java
+    visible: true
   - name: src/domain/customer/Customer.java
     visible: true

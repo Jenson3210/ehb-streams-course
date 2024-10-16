@@ -1,0 +1,19 @@
+type: edu
+files:
+  - name: src/Task.java
+    visible: true
+  - name: test/CourseTests.java
+    visible: false
+    propagatable: false
+  - name: src/domain/articles/Article.java
+    visible: false
+    propagatable: false
+  - name: src/domain/orders/Order.java
+    visible: false
+    propagatable: false
+  - name: test/Database.java
+    visible: false
+    propagatable: false
+  - name: src/domain/orders/OrderLine.java
+    visible: false
+    propagatable: false

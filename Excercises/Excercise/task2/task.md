@@ -1,0 +1,1 @@
+Complete the method that combines the names of all customers and articles into a single list of strings. The return should be "firstname lastname" for each customer and "name" for each article.
