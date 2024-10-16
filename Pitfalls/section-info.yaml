@@ -1,0 +1,4 @@
+content:
+  - method call inside stream or loop
+  - endless streams
+  - intermediate order matters

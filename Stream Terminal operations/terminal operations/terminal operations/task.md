@@ -1,0 +1,15 @@
+- collect(Collectors…)
+  - toList 
+  - joining 
+  - averagingDouble 
+  - summingDouble 
+  - …
+- toList --> as of JAVA 17 
+- max, min(Comparators…)
+  - comparingDouble 
+  - comparingInt
+  - …
+- Primitive Streams 
+  - sum 
+  - min 
+  - max

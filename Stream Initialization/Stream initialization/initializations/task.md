@@ -1,0 +1,6 @@
+- Stream.empty()
+- collection.stream()
+- Stream.of()
+- Stream.concat(…)
+- Intstream.range/rangeClosed(…)
+- LongStream.range/rangeClosed(…)

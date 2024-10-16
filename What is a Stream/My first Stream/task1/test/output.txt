@@ -1,0 +1,2 @@
+The sum of all the order lines prices is: €39.00
+The sum of all the order lines prices is: €39.00

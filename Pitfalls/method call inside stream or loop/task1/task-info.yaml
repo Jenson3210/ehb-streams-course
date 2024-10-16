@@ -1,0 +1,18 @@
+type: ide
+files:
+  - name: src/Main.java
+    visible: true
+  - name: src/domain/customer/Customer.java
+    visible: true
+  - name: src/Database.java
+    visible: true
+  - name: src/domain/orders/OrderLine.java
+    visible: true
+  - name: src/domain/orders/Order.java
+    visible: true
+  - name: src/domain/articles/Article.java
+    visible: true
+  - name: src/view/ArticleDTO.java
+    visible: true
+  - name: src/view/OrderLineDTO.java
+    visible: true

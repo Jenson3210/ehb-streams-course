@@ -1,0 +1,16 @@
+Beer: 1
+Candy: 2
+Coffee: 3
+Donuts: 1
+Ice Cream: 1
+Pineapple: 1
+Pizza: 2
+Taco: 1
+Beer: 1
+Candy: 2
+Coffee: 3
+Donuts: 1
+Ice Cream: 1
+Pineapple: 1
+Pizza: 2
+Taco: 1
