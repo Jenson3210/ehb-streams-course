@@ -3,9 +3,9 @@ import domain.orders.OrderLine;
 public class Main {
 
     public static void main(String[] args) {
-        System.out.printf("The sum of all the order lines prices is: €%.2f%n", getPrice());
+        System.out.printf("The sum of all the order lines prices is: EUR%.2f%n", getPrice());
 
-        System.out.printf("The sum of all the order lines prices is: €%.2f%n", getPriceUsingStream());
+        System.out.printf("The sum of all the order lines prices is: EUR%.2f%n", getPriceUsingStream());
     }
 
     private static Double getPrice() {
