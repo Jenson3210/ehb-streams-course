@@ -14,14 +14,14 @@ public class Main {
                 === Introduction ===
                   Hello, my name is Jente.
                   
-                  I work for %s where i am currently active as a %s.
+                  I work for %s where I am currently active as a %s.
                   My main task is to %s.
                   The last year I have been working on %s.
                   
                   I strongly believe in open source usages for companies as I think the entire world knows more than just one company.
                   I am an official contributor to several open source projects:
                 %s
-                  I am also a big enthusiast of the advent of code. I have been participating for the last 3 years.
+                  I am also a big enthusiast of the advent of code. I have been participating for several years.
                   
                 === End ===
                 """.formatted(COMPANY, ROLE, MAIN_TASK, RECENT_PROJECT, getOpenSourceProjects()));

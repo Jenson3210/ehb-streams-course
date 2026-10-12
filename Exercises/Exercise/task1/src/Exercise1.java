@@ -4,7 +4,7 @@ import java.util.List;
 
 import static java.util.Collections.emptyList;
 
-public class Excercise1 {
+public class Exercise1 {
 
     List<Customer> listOfAllCustomersWhereLastNameContainsE(List<Customer> customers) {
         return emptyList();

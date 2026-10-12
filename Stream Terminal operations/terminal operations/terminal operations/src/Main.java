@@ -14,7 +14,7 @@ public class Main {
         joiningIntoAString();
         countingItems();
         quickMath();
-        comparators();
+        collectorsAndComparators();
         theTerminalActionCanLimitTheIntermediateActionsExecutedWithinTheStream();
     }
 
@@ -31,7 +31,7 @@ public class Main {
         articles.add(Database.CHICKEN);
 
         System.out.println("Paid Orders: " + paidOrders);
-        System.out.println("Articles: " + articles);
+        System.out.println("Articles: " + articles.stream().sorted(Comparator.comparingInt(Article::id)).toList());
     }
 
     static void collectingIntoImmutableCollections() {
@@ -45,7 +45,7 @@ public class Main {
                 .collect(Collectors.toUnmodifiableSet());
 
         System.out.println("Paid Orders: " + paidOrders);
-        System.out.println("Articles: " + articles);
+        System.out.println("Articles: " + articles.stream().sorted(Comparator.comparingInt(Article::id)).toList());
     }
 
     static void joiningIntoAString() {
@@ -53,7 +53,7 @@ public class Main {
                 .map(Article::name)
                 .collect(Collectors.joining("|"));
 
-        System.out.println("customers: [" + pipeSeparatedNames + "]");
+        System.out.println("articles: [" + pipeSeparatedNames + "]");
     }
 
     static void countingItems() {
@@ -89,7 +89,7 @@ public class Main {
         System.out.println("min: " + minOrderLinePrice);
     }
 
-    static void comparators() {
+    static void collectorsAndComparators() {
         List<OrderLine> orderLines = Database.orderLines;
 
         double totalRevenue = orderLines.stream()

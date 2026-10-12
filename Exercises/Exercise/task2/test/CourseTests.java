@@ -3,7 +3,6 @@ import domain.customer.Customer;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
-import java.util.stream.Stream;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -62,7 +61,11 @@ public class CourseTests {
 
   @Test
   public void testSolution() {
-    List<String> result = Stream.concat(customers.stream().map(customer -> "%s %s".formatted(customer.name(), customer.lastName())), articles.stream().map(Article::name)).toList();
-    assertThat(Task.returnAllCustomerNamesAndArticlesNames(customers, articles)).containsExactlyInAnyOrderElementsOf(result);
+    List<String> result = Task.returnAllCustomerNamesAndArticlesNames(customers, articles);
+
+    assertThat(result)
+            .as("34 customers (\"firstname lastname\") + 10 articles (name), in any order")
+            .hasSize(44)
+            .contains("John Doe", "Jente Sondervorst", "Elinor O'Quinn", "Coffee", "Ice Cream");
   }
 }

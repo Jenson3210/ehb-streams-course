@@ -9,7 +9,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 public class CourseTests {
 
   @Test
-  void returnAllArticleNamesInUnpaidOrders() {
+  void returnAllUniqueArticleNamesInUnpaidOrders() {
     List<Order> orders = Database.orders;
     List<Article> articles = Database.articles;
 

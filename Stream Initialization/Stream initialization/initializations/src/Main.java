@@ -19,6 +19,7 @@ public class Main {
     }
 
     static void usingStreamFunctionOnAList() {
+        System.out.println("--- collection.stream() ---");
         //make a list
         List<Article> articles = Database.articles;
 
@@ -30,6 +31,7 @@ public class Main {
     }
 
     static void canAlsoBeAnEmptyList() {
+        System.out.println("--- empty list ---");
         //make a list
         List<Article> articles = Collections.emptyList();
 
@@ -38,9 +40,11 @@ public class Main {
 
         //print the stream
         stream.forEach(System.out::println);
+        System.out.println("(empty)");
     }
 
     static void whyDoesThisNotWork() {
+        System.out.println("--- fails on purpose ---");
         //make a list
         List<Article> articles = getArticles();
 
@@ -52,6 +56,7 @@ public class Main {
     }
 
     static void streamOf() {
+        System.out.println("--- Stream.of ---");
         //make a stream
         Stream<Article> stream = Stream.of(Database.BEER, Database.COFFEE);
 
@@ -60,6 +65,7 @@ public class Main {
     }
 
     static void concatStreams() {
+        System.out.println("--- Stream.concat ---");
         //make a list
         Stream<Article> importantArticles = Stream.of(Database.BEER, Database.COFFEE);
         Stream<Article> alsoYummy = Stream.of(Database.PIZZA);
@@ -72,6 +78,7 @@ public class Main {
     }
 
     static void streamBuilder() {
+        System.out.println("--- Stream.builder() ---");
         //make a stream
         Stream<Article> stream = Stream.<Article>builder()
                 .add(Database.BEER)
@@ -89,7 +96,9 @@ public class Main {
         LongStream longStream = LongStream.range(1, 10);
 
         //print the stream
+        System.out.println("--- IntStream.range ---");
         intStream.forEach(System.out::println);
+        System.out.println("--- LongStream.range ---");
         longStream.forEach(System.out::println);
     }
 
@@ -99,7 +108,9 @@ public class Main {
         LongStream longStream = LongStream.rangeClosed(1, 10);
 
         //print the stream
+        System.out.println("--- IntStream.rangeClosed ---");
         intStream.forEach(System.out::println);
+        System.out.println("--- LongStream.rangeClosed ---");
         longStream.forEach(System.out::println);
     }
 

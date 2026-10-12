@@ -10,6 +10,8 @@ summary: |-
   - Stream Intermediate operations
   - Stream Terminal operation
   - Practical Exercises to Reinforce Learning
+vendor:
+  name: Jsd1nqf
 programming_language: Java
 programming_language_version: 25
 content:
@@ -19,9 +21,10 @@ content:
   - Stream Intermediate operations
   - Stream Terminal operations
   - Pitfalls
-  - Excercises
+  - Exercises
 environment_settings:
   jvm_language_level: JDK_25
+  gradle_version: 9.8.1
 additional_files:
   - name: build.gradle
   - name: Introduction/The domain/images/orders.png
@@ -36,4 +39,5 @@ additional_files:
   - name: Mastering_Java_Streams_API.zip
     is_binary: true
   - name: gradle/wrapper/gradle-wrapper.properties
+  - name: CLAUDE.md
 yaml_version: 6

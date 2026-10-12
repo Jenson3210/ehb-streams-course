@@ -45,23 +45,33 @@ class CourseTests {
             new Customer(130, "Kaleb", "Walker")
     );
 
-  private final Excercise1 excercise1 = new Excercise1();
+  private final Exercise1 exercise1 = new Exercise1();
+
+  private static List<Integer> ids(List<Customer> customers) {
+    return customers.stream().map(Customer::id).toList();
+  }
 
   @Test
   public void listOfAllCustomersWhereLastNameContainsE() {
-    List<Customer> customers = excercise1.listOfAllCustomersWhereLastNameContainsE(ALL_CUSTOMERS);
-    assertThat(customers).size().isEqualTo(18);
+    List<Customer> customers = exercise1.listOfAllCustomersWhereLastNameContainsE(ALL_CUSTOMERS);
+    assertThat(ids(customers))
+            .as("last name contains e (ignoring case)")
+            .containsExactlyInAnyOrder(1, 2, 3, 101, 102, 105, 108, 109, 111, 114, 116, 118, 119, 120, 123, 124, 126, 130);
   }
 
   @Test
   public void listOfAllCustomersWhereLastNameContainsEAndNameContainsL() {
-    List<Customer> customers = excercise1.listOfAllCustomersWhereLastNameContainsEAndNameContainsL(ALL_CUSTOMERS);
-    assertThat(customers).size().isEqualTo(6);
+    List<Customer> customers = exercise1.listOfAllCustomersWhereLastNameContainsEAndNameContainsL(ALL_CUSTOMERS);
+    assertThat(ids(customers))
+            .as("last name contains e and first name contains l (ignoring case)")
+            .containsExactlyInAnyOrder(101, 114, 116, 120, 126, 130);
   }
 
   @Test
   void listOfAllCustomersWhereAnyFieldContainsO() {
-    List<Customer> customers = excercise1.listOfAllCustomersWhereAnyFieldContainsO(ALL_CUSTOMERS);
-    assertThat(customers).size().isEqualTo(24);
+    List<Customer> customers = exercise1.listOfAllCustomersWhereAnyFieldContainsO(ALL_CUSTOMERS);
+    assertThat(ids(customers))
+            .as("first name or last name contains o (ignoring case)")
+            .containsExactlyInAnyOrder(1, 2, 3, 4, 102, 104, 106, 107, 108, 109, 110, 113, 114, 115, 116, 119, 122, 123, 124, 125, 126, 127, 128, 129);
   }
 }

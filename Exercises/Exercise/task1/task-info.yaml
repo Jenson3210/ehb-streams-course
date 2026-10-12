@@ -1,6 +1,6 @@
 type: edu
 files:
-  - name: src/Excercise1.java
+  - name: src/Exercise1.java
     visible: true
   - name: test/CourseTests.java
     visible: false
