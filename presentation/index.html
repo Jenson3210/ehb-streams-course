@@ -1,0 +1,1148 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Mastering Java Streams API</title>
+<link rel="stylesheet" href="css/presentation.css">
+</head>
+<body>
+
+<div id="progress"></div>
+
+<div id="stage">
+
+<!-- =================================================================== -->
+<!-- START                                                               -->
+<!-- =================================================================== -->
+
+<section class="slide title" data-title="Mastering Java Streams API" data-section="Start">
+  <div class="kicker">EhB &middot; Java 25 &middot; 3 hours</div>
+  <h1>Mastering the<br>Java Streams API</h1>
+  <div class="sub">From <code>for</code>-loops to pipelines, with the pitfalls included</div>
+  <div class="gap"></div>
+  <div class="small dim">Jente Sondervorst &middot; Software Engineer, Colruyt Group</div>
+  <aside class="notes">
+    <p>Press <kbd>?</kbd> for the keyboard shortcuts, <kbd>O</kbd> for the slide overview, <kbd>N</kbd> to toggle these notes.</p>
+  </aside>
+</section>
+
+<section class="slide" data-title="Who am I?" data-section="Introduction">
+  <div class="kicker">Introduction</div>
+  <h2>Who am I?</h2>
+  <div class="cols two">
+    <div>
+      <ul>
+        <li><strong>Jente</strong>, <em>Software Engineer</em> at Colruyt Group</li>
+        <li>Support the development teams when they have issues &hellip;</li>
+        <li>&hellip; and in the meantime renovate our IT landscape, discovering new roadmap items</li>
+        <li class="frag">Last year: automating code refactoring and version updates, and Kubernetes / containerization</li>
+      </ul>
+    </div>
+    <div>
+      <div class="card frag">
+        <h3>Open source contributor</h3>
+        <ul>
+          <li>OpenRewrite / Moderne.ai</li>
+          <li>Backstage</li>
+          <li>ArgoCD</li>
+          <li>Liquibase</li>
+        </ul>
+        <p class="small dim" style="margin:0">"The entire world knows more than just one company."</p>
+      </div>
+      <p class="frag small" style="margin-top:16px">Big fan of the <strong>Advent of Code</strong>, several years in a row.</p>
+    </div>
+  </div>
+  <aside class="notes">
+    <p>The same text is printed by <code>Main</code> of the first lesson. In <code>getOpenSourceProjects</code> the <code>for</code> loop and the commented-out stream version do the same thing: that is the whole course in one method.</p>
+  </aside>
+</section>
+
+<section class="slide" data-title="Agenda" data-section="Introduction">
+  <div class="kicker">Introduction</div>
+  <h2>Agenda</h2>
+  <ul style="font-size:30px">
+    <li class="frag">Who am I?</li>
+    <li class="frag">Introduction: the tools, the IDE suggestions and the domain</li>
+    <li class="frag">Streams explained (and how to debug them)
+      <ul style="font-size:26px; margin-top:8px">
+        <li>What is a Stream</li>
+        <li>Stream Initialization</li>
+        <li>Stream Intermediate operations</li>
+        <li>Stream Terminal operations</li>
+      </ul>
+    </li>
+    <li class="frag">Pitfalls</li>
+    <li class="frag">Exercises: <em>practice makes perfect</em></li>
+  </ul>
+</section>
+
+<section class="slide" data-title="Tools" data-section="Introduction">
+  <div class="kicker">Introduction</div>
+  <h2>Tools</h2>
+  <table>
+    <tr><th style="width:290px">Tool</th><th>Notes</th></tr>
+    <tr><td><strong>Terminal</strong></td><td>iTerm2 on macOS, Windows Terminal on Windows, any terminal on Linux</td></tr>
+    <tr><td><strong>sdkman</strong></td><td>optional, handy to install and switch Java versions</td></tr>
+    <tr><td><strong>Java 25 (LTS)</strong></td><td>via sdkman or any distribution</td></tr>
+    <tr><td><strong>Gradle</strong></td><td>use the wrapper in the repo: <code>./gradlew</code> (<code>gradlew.bat</code> on Windows), nothing to install</td></tr>
+    <tr><td><strong>IntelliJ IDEA</strong></td><td>with the <em>Learn and Teach</em> plugin</td></tr>
+    <tr><td><strong>JUnit + AssertJ</strong></td><td>already configured in the project</td></tr>
+  </table>
+  <aside class="notes"><p>Check live that Java, <code>./gradlew</code> and the Learn and Teach plugin work on every machine before moving on.</p></aside>
+</section>
+
+<section class="slide" data-title="How this course works" data-section="Introduction">
+  <div class="kicker">Introduction</div>
+  <h2>How this course works</h2>
+  <div class="cols two" style="grid-template-rows: 1fr 1fr; flex:0 0 auto; height: 400px">
+    <div class="card frag"><h3>Theory lessons</h3><p>Open <code>src/Main.java</code>, read it top to bottom and <strong>run it</strong>.</p></div>
+    <div class="card frag"><h3>Output tasks</h3><p>Finish the <code>TODO</code>. Your program's output must match the expected output.</p></div>
+    <div class="card frag"><h3>Exercises</h3><p>Implement the method. The <strong>unit tests</strong> tell you when you are done.</p></div>
+    <div class="card frag"><h3>Pitfalls</h3><p>This code is broken <strong>on purpose</strong>. Run it and watch what goes wrong.</p></div>
+  </div>
+  <div class="takeaway frag">Watch for IntelliJ suggestions (yellow / grey highlights). Applying them is part of the lesson.</div>
+</section>
+
+<section class="slide" data-title="Before you start" data-section="Introduction">
+  <div class="kicker">Introduction</div>
+  <h2>You should be comfortable with&hellip;</h2>
+  <ul style="font-size:30px">
+    <li class="frag">Java syntax, collections (<code>List</code>, <code>Set</code>, <code>Map</code>) and <code>for</code>-loops</li>
+    <li class="frag"><strong>Records</strong>: all domain classes are records</li>
+    <li class="frag"><strong>Lambdas</strong> and <strong>method references</strong>: <code>x -&gt; x * 2</code>, <code>String::length</code></li>
+  </ul>
+  <div class="callout frag"><p>Not sure about lambdas? The next slide is the reminder.</p></div>
+</section>
+
+<section class="slide" data-title="Cheat sheet: functional interfaces" data-section="Introduction">
+  <div class="kicker">Introduction &middot; <span class="tag ref">reference</span></div>
+  <h2>Cheat sheet: functional interfaces</h2>
+  <p class="small dim" style="margin-bottom:8px">Exactly one abstract method, so a lambda or method reference can implement it.</p>
+  <table class="compact">
+    <tr><th>Interface</th><th>Method</th><th>Meaning</th><th>Example</th></tr>
+    <tr><td><code>Predicate&lt;T&gt;</code></td><td><code>boolean test(T)</code></td><td>yes or no about a value</td><td><code>s -&gt; s.isEmpty()</code></td></tr>
+    <tr><td><code>Function&lt;T,R&gt;</code></td><td><code>R apply(T)</code></td><td>turns a value into another value</td><td><code>String::length</code></td></tr>
+    <tr><td><code>Consumer&lt;T&gt;</code></td><td><code>void accept(T)</code></td><td>does something, returns nothing</td><td><code>System.out::println</code></td></tr>
+    <tr><td><code>Supplier&lt;T&gt;</code></td><td><code>T get()</code></td><td>produces a value from nothing</td><td><code>ArrayList::new</code></td></tr>
+    <tr><td><code>BinaryOperator&lt;T&gt;</code></td><td><code>T apply(T, T)</code></td><td>combines two values of one type</td><td><code>(a, b) -&gt; a + b</code></td></tr>
+    <tr><td><code>Comparator&lt;T&gt;</code></td><td><code>int compare(T, T)</code></td><td>orders two values</td><td><code>Comparator.comparingInt(String::length)</code></td></tr>
+  </table>
+  <div class="gap"></div>
+  <script type="text/x-java" data-size="xs">
+    boolean empty = isEmpty.test("");     // true
+    int size = length.apply("streams");   // 7
+    int sum = add.apply(2, 3);            // 5
+    words.sort(byLength);                 // [fig, kiwi, banana]
+  </script>
+</section>
+
+<section class="slide" data-title="IDE code suggestions" data-section="Introduction">
+  <div class="kicker">Introduction</div>
+  <h2>IDE code suggestions</h2>
+  <div class="cols wide-right" style="grid-template-columns: minmax(0,1fr) minmax(0,1fr) minmax(0,0.7fr); align-items:center">
+    <div>
+      <p class="small"><strong>When you see</strong></p>
+      <img class="shot" src="../Introduction/Introduction/images/suggestion_1.png" alt="Code suggestion in an older IntelliJ">
+    </div>
+    <div>
+      <p class="small"><strong>or</strong></p>
+      <img class="shot" src="../Introduction/Introduction/images/suggestion_2.png" alt="Code suggestion in a newer IntelliJ">
+    </div>
+    <div class="frag" style="text-align:center">
+      <p class="small"><strong>you <em>must</em> realize</strong></p>
+      <img class="shot" style="max-height:400px" src="../Introduction/Introduction/images/hulk_suggesting.png" alt="Hulk suggesting changes">
+    </div>
+  </div>
+  <div class="takeaway">Apply a suggestion with <kbd>Alt</kbd>+<kbd>Enter</kbd>, then compare before and after. Some snippets are intentionally suboptimal.</div>
+</section>
+
+<section class="slide" data-title="The domain: four records" data-section="Introduction">
+  <div class="kicker">Introduction &middot; The domain</div>
+  <h2>Four records, used everywhere</h2>
+  <table>
+    <tr><th>Concept</th><th>Record</th><th>Accessors</th></tr>
+    <tr><td><strong>Article</strong></td><td><code>Article(int id, String name)</code></td><td><code>id()</code> <code>name()</code></td></tr>
+    <tr><td><strong>Customer</strong></td><td><code>Customer(int id, String name, String lastName)</code></td><td><code>id()</code> <code>name()</code> <code>lastName()</code></td></tr>
+    <tr><td><strong>Order</strong></td><td><code>Order(int id, int customerId, boolean paid, List&lt;OrderLine&gt; orderLines)</code></td><td><code>id()</code> <code>customerId()</code> <code>paid()</code> <code>orderLines()</code></td></tr>
+    <tr><td><strong>Order line</strong></td><td><code>OrderLine(int articleId, int quantity, double price)</code></td><td><code>articleId()</code> <code>quantity()</code> <code>price()</code> <code>total()</code></td></tr>
+  </table>
+  <div class="gap"></div>
+  <ul class="small">
+    <li class="frag">An order line is a single sale of one article: <em>which</em> (<code>articleId</code>), <em>how many</em> (<code>quantity</code>), unit <code>price</code>.</li>
+    <li class="frag">References are plain <strong>ids</strong>, not objects: to get from an id to the <code>Article</code> or <code>Customer</code> you <strong>look it up</strong>.</li>
+    <li class="frag"><code>OrderLine.total()</code> is <code>price * quantity</code>.</li>
+  </ul>
+</section>
+
+<section class="slide" data-title="The domain: sample data" data-section="Introduction">
+  <div class="kicker">Introduction &middot; The domain</div>
+  <h2>The orders</h2>
+  <div class="cols wide-left" style="grid-template-columns: minmax(0,1.6fr) minmax(0,1fr); align-items:center">
+    <div style="height:100%; display:flex; align-items:center">
+      <img class="shot" src="../Introduction/The%20domain/images/orders.png" alt="Five orders with their order lines">
+    </div>
+    <div class="small">
+      <p>Each row is one order. <strong style="color:var(--good)">Green phone</strong> = paid, <strong style="color:var(--bad)">red phone</strong> = unpaid. The icons are the order lines.</p>
+      <ul>
+        <li class="frag"><strong>10 articles</strong>: Coffee, Pizza, Candy, Pineapple, Donuts, Beer, Apple, Taco, Chicken, Ice Cream</li>
+        <li class="frag"><strong>5 orders</strong>: 3 paid (1, 2, 5), 2 unpaid (3, 4)</li>
+        <li class="frag">Customers only appear in the exercises</li>
+      </ul>
+    </div>
+  </div>
+  <aside class="notes">
+    <p>The picture is an illustration: the paid/unpaid pattern and the number of lines per order match the sample data, but a few icons differ from <code>Database.java</code>.</p>
+    <p>In the Pitfalls lesson the <code>Database</code> lookups contain a <code>Thread.sleep</code> to simulate a slow call.</p>
+  </aside>
+</section>
+
+<!-- =================================================================== -->
+<!-- WHAT IS A STREAM                                                    -->
+<!-- =================================================================== -->
+
+<section class="slide section" data-title="What is a Stream" data-section="What is a Stream">
+  <div class="num">1</div>
+  <h1>What is a Stream?</h1>
+  <div class="sub">A pipeline that describes <em>what</em> to do with data, not <em>how</em> to loop over it.</div>
+</section>
+
+<section class="slide" data-title="My first stream: loop vs stream" data-section="What is a Stream">
+  <div class="kicker">My first Stream &middot; <span class="tag run">run Main</span></div>
+  <h2>Sum of all order line prices</h2>
+  <div class="cols two">
+    <div>
+      <div class="codelabel">The <code>for</code> loop</div>
+      <script type="text/x-java" data-size="sm">
+        private static Double getPrice() {
+            double price = 0d;
+            for (OrderLine orderLine : Database.orderLines) {
+                price += orderLine.total();
+            }
+            return price;
+        }
+      </script>
+      <div class="codelabel good frag">Same result with a stream</div>
+      <script type="text/x-java" data-size="sm" data-frag>
+        private static Double getPriceUsingStream() {
+            //TODO: Use a stream to calculate
+            //      the sum of all the order lines prices
+            return 0.0;
+        }
+      </script>
+    </div>
+    <div>
+      <div class="codelabel">Expected output</div>
+      <script type="text/x-output" data-size="xs">
+        The sum of all the order lines prices is: EUR39.00
+        The sum of all the order lines prices is: EUR39.00
+      </script>
+      <div class="callout frag">
+        <p><strong>Hint.</strong> <code>OrderLine</code> has a <code>total()</code> method. Turn the stream into a stream of <code>double</code>s, then add them up.</p>
+      </div>
+      <p class="small dim frag">While the stub is unsolved, the second line prints <code>EUR0.00</code>.</p>
+    </div>
+  </div>
+  <aside class="notes">
+    <p>Learners implement this themselves. Solution, only if needed:</p>
+    <pre>return Database.orderLines.stream().mapToDouble(OrderLine::total).sum();</pre>
+  </aside>
+</section>
+
+<section class="slide" data-title="Anatomy of a pipeline" data-section="What is a Stream">
+  <div class="kicker">My first Stream</div>
+  <h2>A pipeline has three parts</h2>
+  <div class="pipe">
+    <div class="stage src frag"><h3>Source</h3><p>where the elements come from</p><code>Database.orderLines.stream()</code></div>
+    <div class="arrow frag">&rarr;</div>
+    <div class="stage mid frag"><h3>Intermediate</h3><p>zero or more steps that transform the stream</p><code>.filter(...) .map(...)</code></div>
+    <div class="arrow frag">&rarr;</div>
+    <div class="stage end frag"><h3>Terminal</h3><p>exactly one: produces the result <strong>and starts the pipeline</strong></p><code>.sum() .toList()</code></div>
+  </div>
+  <script type="text/x-java" data-frag>
+    Database.orderLines.stream()      // source
+            .mapToDouble(OrderLine::total)   // intermediate
+            .sum();                          // terminal
+  </script>
+  <div class="takeaway">Nothing runs until the <strong>terminal operation</strong> is called. Intermediate operations are <em>lazy</em>.</div>
+</section>
+
+<section class="slide" data-title="Warehouse replenishment" data-section="What is a Stream">
+  <div class="kicker">My first Stream &middot; <span class="tag run">run Main</span></div>
+  <h2>Warehouse replenishment</h2>
+  <div class="cols two" style="grid-template-columns:minmax(0,0.9fr) minmax(0,1.2fr)">
+    <div class="small">
+      <p>Every <strong>paid</strong> order is replenished with the same quantity of each article. Several orders ship in one delivery, so quantities per article are <strong>added up</strong>. Unpaid orders are ignored.</p>
+      <div class="card frag">
+        <ul style="margin:0">
+          <li>Order 1 (paid): 2 Pizza, 1 Candy</li>
+          <li>Order 2 (paid): 1 Pizza, 1 Beer</li>
+          <li>Order 3 (not paid): 5 Coffee</li>
+        </ul>
+        <p style="margin:8px 0 0">&rarr; deliver <strong>3 Pizza, 1 Candy, 1 Beer</strong></p>
+      </div>
+      <div class="callout warn frag"><p>This task goes beyond what you have seen so far. This is the moment to let an <strong>AI assistant</strong> (Copilot, Claude) help you.</p></div>
+    </div>
+    <div>
+      <div class="codelabel">The loop version, to be rewritten as a stream</div>
+      <script type="text/x-java" data-size="xs">
+        Map<Integer, Integer> replenishment = new HashMap<>();
+        for (Order o : Database.orders) {
+            if (o.paid()) {
+                for (OrderLine orderLine : o.orderLines()) {
+                    int articleId = orderLine.articleId();
+                    int quantity = orderLine.quantity();
+                    replenishment.put(articleId,
+                        replenishment.getOrDefault(articleId, 0)
+                            + quantity);
+                }
+            }
+        }
+        return replenishment;
+      </script>
+      <ul class="small frag">
+        <li><code>filter</code> for the <code>if</code></li>
+        <li><code>flatMap</code> for the inner loop</li>
+        <li>a collector for the <code>Map</code></li>
+      </ul>
+    </div>
+  </div>
+  <aside class="notes">
+    <p>Hints from the task: <code>Collectors.toMap(key, value, merge)</code> or <code>Collectors.groupingBy(classifier, Collectors.summingInt(mapper))</code>.</p>
+    <p>Solution, only if needed:</p>
+    <pre>Database.orders.stream()
+    .filter(Order::paid)
+    .flatMap(o -> o.orderLines().stream())
+    .collect(Collectors.toMap(OrderLine::articleId, OrderLine::quantity, Integer::sum));</pre>
+    <p>Expected: Beer 1, Candy 2, Coffee 3, Donuts 1, Ice Cream 1, Pineapple 1, Pizza 2, Taco 1.</p>
+  </aside>
+</section>
+
+<!-- =================================================================== -->
+<!-- STREAM INITIALIZATION                                               -->
+<!-- =================================================================== -->
+
+<section class="slide section" data-title="Stream Initialization" data-section="Stream Initialization">
+  <div class="num">2</div>
+  <h1>Stream Initialization</h1>
+  <div class="sub">A stream always starts from a source: a collection, values, other streams or a number range.</div>
+</section>
+
+<section class="slide" data-title="From a collection" data-section="Stream Initialization">
+  <div class="kicker">Stream Initialization &middot; <span class="tag run">run Main</span></div>
+  <h2><code>collection.stream()</code></h2>
+  <div class="cols two">
+    <div>
+      <div class="codelabel">A list &rarr; a stream</div>
+      <script type="text/x-java" data-size="sm">
+        List<Article> articles = Database.articles;
+        Stream<Article> stream = articles.stream();
+        stream.forEach(System.out::println);
+      </script>
+      <div class="codelabel frag">An empty list is fine</div>
+      <script type="text/x-java" data-size="sm" data-frag>
+        List<Article> articles = Collections.emptyList();
+        articles.stream().forEach(System.out::println);
+        // prints nothing
+      </script>
+    </div>
+    <div class="frag">
+      <div class="codelabel bad">Fails on purpose &middot; <span style="text-transform:none">find out why together</span></div>
+      <script type="text/x-java" data-size="sm">
+        List<Article> articles = getArticles();
+        Stream<Article> stream = articles.stream(); //>
+        stream.forEach(System.out::println);
+
+        //TODO null safe method receiving a list
+        //     of articles and returning a stream
+        private static List<Article> getArticles() {
+            return null;
+        }
+      </script>
+      <div class="callout bad"><p><code>null.stream()</code> throws a <code>NullPointerException</code>. Next slides: <code>Stream.ofNullable</code>.</p></div>
+    </div>
+  </div>
+</section>
+
+<section class="slide" data-title="Stream.of, concat, builder" data-section="Stream Initialization">
+  <div class="kicker">Stream Initialization &middot; <span class="tag run">run Main</span></div>
+  <h2>From values and other streams</h2>
+  <div class="cols three" style="gap:22px">
+    <div>
+      <h3><code>Stream.of(&hellip;)</code></h3>
+      <script type="text/x-java" data-size="xs">
+        Stream<Article> stream =
+            Stream.of(
+                Database.BEER,
+                Database.COFFEE);
+      </script>
+    </div>
+    <div class="frag">
+      <h3><code>Stream.concat(&hellip;)</code></h3>
+      <script type="text/x-java" data-size="xs">
+        Stream<Article> important =
+            Stream.of(BEER, COFFEE);
+        Stream<Article> alsoYummy =
+            Stream.of(PIZZA);
+        Stream<Article> stream =
+            Stream.concat(important,
+                          alsoYummy);
+      </script>
+    </div>
+    <div class="frag">
+      <h3><code>Stream.builder()</code></h3>
+      <script type="text/x-java" data-size="xs">
+        Stream<Article> stream =
+            Stream.<Article>builder()
+                .add(BEER)
+                .add(COFFEE)
+                .add(PIZZA)
+                .build();
+      </script>
+    </div>
+  </div>
+  <div class="takeaway frag">Two streams of the same type can be combined into one with <code>Stream.concat</code>.</div>
+</section>
+
+<section class="slide" data-title="range vs rangeClosed" data-section="Stream Initialization">
+  <div class="kicker">Stream Initialization &middot; <span class="tag run">run Main</span></div>
+  <h2><code>range</code> vs <code>rangeClosed</code></h2>
+  <div class="cols two" style="flex:0 0 auto">
+    <div>
+      <script type="text/x-java">
+        IntStream.range(1, 10)
+        LongStream.range(1, 10)
+      </script>
+      <div class="boxes" data-from="1" data-to="10" data-keep="1-9" data-gone="10"></div>
+      <p class="small dim">the end value is <strong>excluded</strong>: 1 &hellip; 9</p>
+    </div>
+    <div class="frag">
+      <script type="text/x-java">
+        IntStream.rangeClosed(1, 10)
+        LongStream.rangeClosed(1, 10)
+      </script>
+      <div class="boxes" data-from="1" data-to="10" data-keep="1-10"></div>
+      <p class="small dim">the end value is <strong>included</strong>: 1 &hellip; 10</p>
+    </div>
+  </div>
+  <div class="gap"></div>
+  <div class="callout frag"><p><code>IntStream</code> and <code>LongStream</code> are <strong>primitive streams</strong>: no boxing, and extras like <code>sum()</code> and <code>average()</code>.</p></div>
+  <div class="takeaway frag"><code>range</code> excludes the end value, <code>rangeClosed</code> includes it.</div>
+</section>
+
+<section class="slide" data-title="Also good to know: sources" data-section="Stream Initialization">
+  <div class="kicker">Stream Initialization &middot; <span class="tag ref">not in Main</span></div>
+  <h2>Also good to know</h2>
+  <table>
+    <tr><th>Source</th><th>What you get</th></tr>
+    <tr><td><code>Stream.empty()</code></td><td>a stream without elements</td></tr>
+    <tr><td><code>Arrays.stream(array)</code></td><td>a stream from an array</td></tr>
+    <tr class="hl"><td><code>Stream.generate(supplier)</code><br><code>Stream.iterate(seed, next)</code></td><td><strong>infinite</strong>: always combine with <code>limit</code></td></tr>
+    <tr><td><code>Stream.iterate(seed, hasNext, next)</code></td><td>the finite, <code>for</code>-like variant</td></tr>
+    <tr><td><code>"text".chars()</code></td><td>an <code>IntStream</code> of the characters</td></tr>
+    <tr><td><code>map.entrySet().stream()</code></td><td>a stream over a <code>Map</code></td></tr>
+    <tr><td><code>Files.lines(path)</code></td><td>a stream of the lines of a file</td></tr>
+  </table>
+  <div class="takeaway">A stream always starts from a source. <code>generate</code> and <code>iterate</code> are infinite: always combine them with <code>limit</code>.</div>
+</section>
+
+<!-- =================================================================== -->
+<!-- INTERMEDIATE OPERATIONS                                             -->
+<!-- =================================================================== -->
+
+<section class="slide section" data-title="Intermediate operations" data-section="Intermediate operations">
+  <div class="num">3</div>
+  <h1>Intermediate operations</h1>
+  <div class="sub">Each one returns a new stream, so you can chain them. Nothing runs until a terminal operation is called.</div>
+</section>
+
+<section class="slide" data-title="The operations: demonstrated" data-section="Intermediate operations">
+  <div class="kicker">Intermediate operations</div>
+  <h2>What changes between input and output?</h2>
+  <table>
+    <tr><th style="width:190px">Operation</th><th style="width:330px">Count and type</th><th>Meaning</th></tr>
+    <tr class="frag"><td><code>filter</code></td><td><strong>fewer</strong> elements, same type</td><td>keeps what matches the condition</td></tr>
+    <tr class="frag"><td><code>map</code></td><td>same number, <strong>new type</strong></td><td>one output per input</td></tr>
+    <tr class="frag"><td><code>flatMap</code></td><td>one-to-many, merged into one stream</td><td>e.g. order &rarr; its order lines</td></tr>
+    <tr class="frag"><td><code>distinct</code></td><td>fewer elements, same type</td><td>drops duplicates; its position changes how much work follows</td></tr>
+  </table>
+  <div class="gap"></div>
+  <div class="callout frag"><p>Demonstrated in <code>Main</code>. The next slide lists the operations that are <strong>not</strong> demoed.</p></div>
+</section>
+
+<section class="slide" data-title="The operations: not demoed" data-section="Intermediate operations">
+  <div class="kicker">Intermediate operations &middot; <span class="tag ref">not demoed in Main</span></div>
+  <h2>More intermediate operations</h2>
+  <table class="compact">
+    <tr><th style="width:230px">Operation</th><th>What it does</th></tr>
+    <tr><td><code>skip(n)</code></td><td>drops the first n elements</td></tr>
+    <tr><td><code>limit(n)</code></td><td>keeps at most the first n elements (makes an infinite stream finite)</td></tr>
+    <tr><td><code>takeWhile(p)</code></td><td>keeps elements until the condition is false for the first time, then stops</td></tr>
+    <tr><td><code>dropWhile(p)</code></td><td>drops elements until the condition is false for the first time, then keeps the rest</td></tr>
+    <tr><td><code>sorted()</code></td><td>same elements, new order (needs to see all elements first)</td></tr>
+    <tr><td><code>peek(c)</code></td><td>same elements, runs an action on each on the way past (debugging only)</td></tr>
+    <tr><td><code>mapToInt</code> &rarr; <code>IntStream</code></td><td>same count, primitive ints</td></tr>
+    <tr><td><code>mapToDouble</code> &rarr; <code>DoubleStream</code></td><td>same count, primitive doubles</td></tr>
+    <tr><td><code>mapToLong</code> &rarr; <code>LongStream</code></td><td>same count, primitive longs</td></tr>
+  </table>
+</section>
+
+<section class="slide" data-title="A step: lambda, reference or method" data-section="Intermediate operations">
+  <div class="kicker">Intermediate operations &middot; <span class="tag run">run Main</span></div>
+  <h2>The same step, four ways</h2>
+  <div class="cols two" style="grid-template-rows:auto auto; flex:0 0 auto; gap:10px 28px">
+    <div>
+      <div class="codelabel">1. Statement lambda</div>
+      <script type="text/x-java" data-size="xs">
+        orders.stream()
+            .filter(order -> {
+                if (order.orderLines().size() > 3)
+                    return true;
+                else {
+                    return false;
+                }
+            })
+      </script>
+    </div>
+    <div class="frag">
+      <div class="codelabel">2. Expression lambda</div>
+      <script type="text/x-java" data-size="xs">
+        Database.orders.stream()
+            .filter(order -> order.paid())
+      </script>
+      <div class="codelabel frag">3. Method reference</div>
+      <script type="text/x-java" data-size="xs" data-frag>
+        Database.orders.stream()
+            .filter(Order::paid)
+      </script>
+    </div>
+    <div class="frag" style="grid-column: 1 / span 2">
+      <div class="codelabel">4. A method that returns the step</div>
+      <script type="text/x-java" data-size="xs">
+        Database.orders.stream().map(getFirstArticleId())
+
+        static private Function<Order, Integer> getFirstArticleId() {
+            return order -> order.orderLines().get(0).articleId();
+        }
+      </script>
+    </div>
+  </div>
+  <div class="takeaway frag">A step can be a lambda, a method reference or a method. IntelliJ will suggest the shorter forms: apply them.</div>
+  <aside class="notes">
+    <p>The first lambda is an IntelliJ-suggestion hook on purpose: the <code>if/else return true/false</code> collapses to <code>order.orderLines().size() &gt; 3</code>. Do not "fix" it in the source.</p>
+  </aside>
+</section>
+
+<section class="slide" data-title="Chaining operations" data-section="Intermediate operations">
+  <div class="kicker">Intermediate operations &middot; <span class="tag run">run Main</span></div>
+  <h2>Names of articles in paid orders</h2>
+  <div class="cols wide-left" style="grid-template-columns: minmax(0,1.25fr) minmax(0,1fr)">
+    <script type="text/x-java" data-size="sm">
+      Database.orders.stream()
+          .filter(Order::paid)               // orders
+          .map(Order::orderLines)            // lists of lines
+          .flatMap(Collection::stream)       // lines
+          .map(OrderLine::articleId)         // ids
+          .map(Database::getArticle)         // articles
+          .map(Article::name)                // names
+          .distinct()
+          .forEach(System.out::println);
+    </script>
+    <div class="small">
+      <ul>
+        <li class="frag"><code>filter</code>: 5 orders &rarr; 3 paid orders</li>
+        <li class="frag"><code>map</code> + <code>flatMap</code>: orders &rarr; one stream of lines</li>
+        <li class="frag"><code>map</code> twice: line &rarr; id &rarr; <code>Article</code> (a lookup!)</li>
+        <li class="frag"><code>distinct</code>: no article twice</li>
+        <li class="frag"><code>forEach</code>: the terminal operation that starts it all</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<section class="slide" data-title="The order of the steps matters" data-section="Intermediate operations">
+  <div class="kicker">Intermediate operations &middot; <span class="tag run">run Main</span></div>
+  <h2>Same result, different amount of work</h2>
+  <div class="cols two">
+    <div>
+      <div class="codelabel bad">distinct last</div>
+      <script type="text/x-java" data-size="xs">
+        Database.orders.stream()
+            .filter(Order::paid)
+            .map(Order::orderLines)
+            .flatMap(Collection::stream)
+            .map(OrderLine::articleId)
+            .map(Database::getArticle)    //>
+            .map(Article::name)
+            .distinct()                   //>
+            .reduce((s, s2) -> "");
+      </script>
+    </div>
+    <div>
+      <div class="codelabel good">distinct first</div>
+      <script type="text/x-java" data-size="xs">
+        Database.orders.stream()
+            .filter(Order::paid)
+            .map(Order::orderLines)
+            .flatMap(Collection::stream)
+            .map(OrderLine::articleId)
+            .distinct()                   //>
+            .map(Database::getArticle)    //>
+            .map(Article::name)
+            .reduce((s, s2) -> "");
+      </script>
+    </div>
+  </div>
+  <div class="callout frag"><p>Both run 10 000 times and print their timing. <strong>distinct first</strong> looks up each article once, <strong>distinct last</strong> looks up every order line.</p></div>
+  <div class="takeaway frag">The order of the steps changes the result and the amount of work.</div>
+</section>
+
+<section class="slide" data-title="peek: look inside a pipeline" data-section="Intermediate operations">
+  <div class="kicker">Debugging &middot; 1 of 4</div>
+  <h2><code>peek</code>: quick, but it edits your code</h2>
+  <div class="cols two">
+    <div>
+      <script type="text/x-java" data-size="sm">
+        Database.orders.stream()
+            .filter(Order::paid)
+            .peek(System.out::println)   //>
+            .map(Order::orderLines)
+            .flatMap(Collection::stream)
+            .forEach(System.out::println);
+      </script>
+      <ul class="small">
+        <li class="frag">Put it between two stages, read what flows past. Move it one stage further and compare.</li>
+        <li class="frag">Elements arrive <strong>one at a time</strong>, interleaved with later stages, not stage by stage (laziness).</li>
+      </ul>
+    </div>
+    <div>
+      <div class="callout bad frag">
+        <p><strong>For debugging only.</strong></p>
+        <p class="small">You have to change the code (and remove it again). A <code>peek</code> whose action changes state is a bug waiting to happen. The JDK documents it as existing mainly to support debugging.</p>
+      </div>
+      <div class="callout warn frag">
+        <p class="small"><code>peek</code> is intermediate: a pipeline of only intermediate operations prints nothing.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="slide" data-title="Breakpoints inside lambdas" data-section="Intermediate operations">
+  <div class="kicker">Debugging &middot; 2 of 4 &middot; <span class="tag run">IntelliJ</span></div>
+  <h2>Breakpoints inside lambdas</h2>
+  <ol style="font-size:25px">
+    <li class="frag">Open <code>Main</code>, find the lambda in <code>filter(order -&gt; order.paid())</code>.</li>
+    <li class="frag">Click in the gutter next to that line, then start with <strong>Debug</strong>.</li>
+    <li class="frag">The breakpoint is hit <strong>once per element</strong>. Look at <code>order</code> in the Variables view.</li>
+    <li class="frag"><strong>Resume Program</strong> jumps to the next element; step to follow one element through the chain.</li>
+  </ol>
+  <div class="callout frag">
+    <p class="small">When a line holds more than one candidate, the gutter shows small circles inside the line (a line breakpoint and one per lambda) so you choose which you mean.</p>
+  </div>
+  <div class="callout warn frag">
+    <p class="small">The chain in <code>actionsCanBeChained</code> uses method references only, so there is no lambda body to stop in. Use the stream trace there, or temporarily turn a reference into a lambda.</p>
+  </div>
+</section>
+
+<section class="slide" data-title="Trace Current Stream Chain" data-section="Intermediate operations">
+  <div class="kicker">Debugging &middot; 3 of 4 &middot; <span class="tag run">IntelliJ</span></div>
+  <h2>Trace Current Stream Chain</h2>
+  <div class="cols two">
+    <ol class="small">
+      <li class="frag">Breakpoint on the line where the stream starts in <code>actionsCanBeChained</code> (<code>Database.orders.stream()</code>). Run in <strong>Debug</strong>.</li>
+      <li class="frag">In the toolbar of the Debug window open <strong>More</strong> &rarr; <strong>Trace Current Stream Chain</strong>.</li>
+      <li class="frag">The <em>Stream Trace</em> dialog has a tab per stage: what it received and what it returned. <strong>Flat Mode</strong> shows everything in one overview.</li>
+    </ol>
+    <div>
+      <div class="card frag">
+        <h3>Good to know</h3>
+        <ul class="small">
+          <li>Comes with the <em>Java Stream Debugger</em> plugin (installed and enabled?)</li>
+          <li>The stream must end with a terminal operation. Result-less ones such as <code>forEach</code> are not drawn in Flat Mode.</li>
+          <li>Only works on your own project code, not library code.</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+  <div class="takeaway frag">You see at which stage an element disappeared (<code>filter</code>, <code>distinct</code>) or changed (<code>map</code>).</div>
+</section>
+
+<section class="slide" data-title="Reading a stack trace" data-section="Intermediate operations">
+  <div class="kicker">Debugging &middot; 4 of 4</div>
+  <h2>Reading a stack trace through <code>java.util.stream</code></h2>
+  <ul style="font-size:24px">
+    <li class="frag">Many frames from <code>java.util.stream</code> (<code>ReferencePipeline</code>, <code>Sink</code>, <code>AbstractPipeline</code>) sit between your lambda and the terminal operation: that is plumbing, <strong>ignore it</strong>.</li>
+    <li class="frag">Read from the top for the exception type and message, then find the <strong>first frame in your code</strong>: the lambda that failed (<code>Main.lambda$&hellip;</code>).</li>
+    <li class="frag">The last frame of your code lower down is the line with the terminal operation that started the pipeline.</li>
+    <li class="frag">The trace does <strong>not</strong> say which element failed: use a lambda breakpoint (with a condition) or <code>peek</code>.</li>
+    <li class="frag">Because of laziness the failure happens at the <strong>terminal operation</strong>, not where you wrote the faulty <code>map</code>.</li>
+  </ul>
+  <div class="takeaway frag"><code>peek</code> for a quick look &middot; lambda breakpoint for one element &middot; <em>Trace Current Stream Chain</em> for the whole chain.</div>
+</section>
+
+<!-- =================================================================== -->
+<!-- TERMINAL OPERATIONS                                                 -->
+<!-- =================================================================== -->
+
+<section class="slide section" data-title="Terminal operations" data-section="Terminal operations">
+  <div class="num">4</div>
+  <h1>Terminal operations</h1>
+  <div class="sub">The one step that starts the pipeline, produces the result and decides how many elements are processed.</div>
+</section>
+
+<section class="slide" data-title="Collecting and counting" data-section="Terminal operations">
+  <div class="kicker">Terminal operations &middot; <span class="tag run">run Main</span></div>
+  <h2>The operations in <code>Main.java</code></h2>
+  <table class="compact">
+    <tr><th>Operation</th><th>What it does</th></tr>
+    <tr class="frag"><td><code>collect(Collectors.toList())</code></td><td>collects the elements into a <code>List</code></td></tr>
+    <tr class="frag"><td><code>collect(Collectors.toSet())</code></td><td>a <code>Set</code>: duplicates disappear, no order guaranteed</td></tr>
+    <tr class="frag"><td><code>toUnmodifiableList()</code> / <code>toUnmodifiableSet()</code></td><td>a collection that cannot be changed afterwards</td></tr>
+    <tr class="frag"><td><code>collect(Collectors.joining("|"))</code></td><td>glues <code>String</code> elements into one <code>String</code></td></tr>
+    <tr class="frag"><td><code>count()</code></td><td>number of elements left in the stream</td></tr>
+    <tr class="frag"><td><code>mapToDouble(&hellip;).sum() / average() / max() / min()</code></td><td>totals on a primitive stream; <code>average</code>, <code>max</code>, <code>min</code> return an optional, hence <code>orElse(0)</code></td></tr>
+    <tr class="frag"><td><code>summingDouble(&hellip;)</code> / <code>averagingDouble(&hellip;)</code></td><td>the same totals, as a <code>Collector</code></td></tr>
+    <tr class="frag"><td><code>max(Comparator)</code> / <code>min(Comparator)</code></td><td>largest or smallest by a <code>Comparator</code>, e.g. <code>comparingDouble</code></td></tr>
+    <tr class="frag"><td><code>findFirst()</code></td><td>first element, and <strong>stops the stream there</strong></td></tr>
+  </table>
+  <aside class="notes"><p>The sets are sorted before they are printed: a <code>Set</code> has no guaranteed order and <code>toUnmodifiableSet()</code> may differ from run to run, so sorting makes the output identical for everyone.</p></aside>
+</section>
+
+<section class="slide" data-title="Three ways to get a List" data-section="Terminal operations">
+  <div class="kicker">Terminal operations</div>
+  <h2>Three ways to get a <code>List</code></h2>
+  <table>
+    <tr><th>Call</th><th>Result list</th><th><code>null</code> elements</th></tr>
+    <tr class="frag"><td><code>collect(Collectors.toList())</code></td><td>an <code>ArrayList</code> in practice, <strong>not guaranteed</strong></td><td>allowed</td></tr>
+    <tr class="frag hl"><td><code>.toList()</code> <span class="tag">Java 16+</span></td><td><strong>unmodifiable</strong>: <code>add</code> throws <code>UnsupportedOperationException</code></td><td>allowed</td></tr>
+    <tr class="frag"><td><code>collect(Collectors.toUnmodifiableList())</code></td><td>unmodifiable</td><td><strong>rejected</strong>: <code>NullPointerException</code></td></tr>
+  </table>
+  <div class="gap"></div>
+  <div class="callout warn frag">
+    <p class="small">IntelliJ suggests <code>.toList()</code>. Accepting is fine, but <code>collectingIntoCollection</code> calls <code>add</code> on the result of <code>collect(Collectors.toList())</code>: <strong>it breaks when you accept the suggestion</strong>.</p>
+  </div>
+  <div class="callout frag">
+    <p class="small"><strong>Money as <code>double</code>?</strong> The demos do, to keep code short. In real code use <code>BigDecimal</code>: <code>double</code> cannot represent amounts such as <code>0.1</code> exactly.</p>
+  </div>
+</section>
+
+<section class="slide" data-title="Short-circuiting: findFirst" data-section="Terminal operations">
+  <div class="kicker">Terminal operations &middot; <span class="tag run">run Main</span></div>
+  <h2>The terminal operation decides how much work happens</h2>
+  <div class="cols two" style="grid-template-columns:minmax(0,1.5fr) minmax(0,1fr)">
+    <script type="text/x-java" data-size="xs">
+      Integer orderId = Database.orders.stream()
+          .peek(order -> System.out.println("Before filtering: " + order))
+          .filter(order -> !order.paid())
+          .peek(order -> System.out.println("After filtering: " + order))
+          .map(Order::id)
+          .findFirst()                 //>
+          .orElse(-1);
+
+      System.out.println("orderId: " + orderId);
+    </script>
+    <div>
+      <div class="codelabel">Console (records shortened)</div>
+      <div class="console" style="font-size:15px">
+        <div class="frag before">Before filtering: Order[id=1, paid=true, &hellip;]</div>
+        <div class="frag before">Before filtering: Order[id=2, paid=true, &hellip;]</div>
+        <div class="frag before">Before filtering: Order[id=3, paid=false, &hellip;]</div>
+        <div class="frag after">After filtering:  Order[id=3, paid=false, &hellip;]</div>
+        <div class="frag res">orderId: 3</div>
+      </div>
+      <div class="callout good frag"><p class="small">Orders <strong>4</strong> and <strong>5</strong> are never touched: <code>findFirst</code> short-circuits. Elements flow through <em>one at a time</em>.</p></div>
+    </div>
+  </div>
+</section>
+
+<section class="slide" data-title="Collectors cheat sheet (1/2)" data-section="Terminal operations">
+  <div class="kicker">Terminal operations &middot; <span class="tag ref">reference</span></div>
+  <h2>Collectors cheat sheet <span class="dim" style="font-size:26px">1 / 2</span></h2>
+  <table class="compact">
+    <tr><th style="width:250px">Collector</th><th>Example on the course data</th><th style="width:260px">Result</th></tr>
+    <tr class="frag"><td><code>groupingBy(key)</code></td><td><code>orders.stream().collect(groupingBy(Order::customerId))</code></td><td>customer id &rarr; list of their orders</td></tr>
+    <tr class="frag"><td><code>groupingBy(key, counting())</code></td><td><code>&hellip;groupingBy(Order::customerId, counting())</code></td><td><code>{1=2, 2=2, 3=1}</code></td></tr>
+    <tr class="frag"><td><code>groupingBy(key, summingDouble(&hellip;))</code></td><td><code>&hellip;groupingBy(Order::customerId, summingDouble(Order::total))</code></td><td><code>{1=20.5, 2=13.0, 3=5.5}</code></td></tr>
+    <tr class="frag"><td><code>groupingBy(key, mapping(f, toList()))</code></td><td><code>&hellip;groupingBy(Order::customerId, mapping(Order::id, toList()))</code></td><td><code>{1=[1, 2], 2=[3, 4], 3=[5]}</code></td></tr>
+  </table>
+  <div class="gap"></div>
+  <div class="takeaway frag"><code>groupingBy</code> makes a <code>Map&lt;key, List&gt;</code>. Add a downstream collector (<code>counting</code>, <code>summingDouble</code>, <code>mapping</code>) to count, sum or transform each group.</div>
+</section>
+
+<section class="slide" data-title="Collectors cheat sheet (2/2)" data-section="Terminal operations">
+  <div class="kicker">Terminal operations &middot; <span class="tag ref">reference</span></div>
+  <h2>Collectors cheat sheet <span class="dim" style="font-size:26px">2 / 2</span></h2>
+  <table class="compact">
+    <tr><th style="width:230px">Collector</th><th>Example on the course data</th><th style="width:330px">Result</th></tr>
+    <tr class="frag"><td><code>partitioningBy(p)</code></td><td><code>orders.stream().collect(partitioningBy(Order::paid, counting()))</code></td><td><code>{false=2, true=3}</code></td></tr>
+    <tr class="frag"><td><code>toMap(key, value, merge)</code></td><td><code>orderLines.stream().collect(toMap(OrderLine::articleId, OrderLine::quantity, Integer::sum))</code></td><td>total quantity per article id: <code>{1=5, 2=2, 3=2, 5=1, 7=2, 8=3, 9=2, 10=2}</code></td></tr>
+    <tr class="frag"><td><code>summarizingDouble(&hellip;)</code></td><td><code>orderLines.stream().collect(summarizingDouble(OrderLine::total))</code></td><td><code>count=18, sum=39.0, min=0.6, average=2.1666&hellip;, max=6.0</code></td></tr>
+    <tr class="frag"><td><code>teeing(c1, c2, merger)</code></td><td><code>orders.stream().collect(teeing(counting(), summingDouble(Order::total), (count, sum) -&gt; count + " orders, " + sum))</code></td><td><code>5 orders, 39.0</code></td></tr>
+  </table>
+  <div class="gap"></div>
+  <div class="callout warn frag"><p class="small">Without a merge function <code>toMap</code> throws <code>IllegalStateException</code> on a duplicate key: <code>Duplicate key 1 (attempted merging values 1 and 1)</code>. <code>partitioningBy</code> always has exactly two keys.</p></div>
+  <div class="callout frag"><p class="small">A <code>Map</code> has no guaranteed order either: sort (or use a <code>TreeMap</code>) before you compare printed output.</p></div>
+</section>
+
+<section class="slide" data-title="Sorting" data-section="Terminal operations">
+  <div class="kicker">Terminal operations &middot; <span class="tag ref">beyond what we run</span></div>
+  <h2>Sorting</h2>
+  <script type="text/x-java" data-size="xs">
+    // natural order on a property, reversed
+    articles.stream().map(Article::name).sorted(Comparator.reverseOrder()).toList();
+    // [Taco, Pizza, Pineapple, Ice Cream, Donuts, Coffee, Chicken, Candy, Beer, Apple]
+
+    // most expensive line first, ties broken by article id
+    orderLines.stream()
+            .sorted(Comparator.comparingDouble(OrderLine::total).reversed().thenComparing(OrderLine::articleId))
+            .limit(4).toList();
+    // articleId 8 (6.0), articleId 2 (2 x 2.0 = 4.0), articleId 5 (3.5), articleId 1 (3.4)
+
+    // shortest name first, then alphabetical
+    articles.stream().sorted(Comparator.comparing((Article a) -> a.name().length()).thenComparing(Article::name))
+            .map(Article::name).toList();
+    // [Beer, Taco, Apple, Candy, Pizza, Coffee, Donuts, Chicken, Ice Cream, Pineapple]
+  </script>
+  <div class="callout frag"><p class="small"><code>reversed()</code> flips the whole comparator built so far, so place it where you want it. When the lambda in <code>Comparator.comparing</code> needs a type, write it on the parameter: <code>(Article a) -&gt; &hellip;</code>.</p></div>
+</section>
+
+<section class="slide" data-title="Match, find and reduce" data-section="Terminal operations">
+  <div class="kicker">Terminal operations &middot; <span class="tag ref">beyond what we run</span></div>
+  <h2>Boolean questions and <code>reduce</code></h2>
+  <table class="compact">
+    <tr><th style="width:230px">Operation</th><th>Example on the course data</th><th style="width:150px">Result</th></tr>
+    <tr class="frag"><td><code>anyMatch(p)</code></td><td><code>orders.stream().anyMatch(o -&gt; !o.paid())</code></td><td><code>true</code></td></tr>
+    <tr class="frag"><td><code>allMatch(p)</code></td><td><code>orders.stream().allMatch(Order::paid)</code></td><td><code>false</code></td></tr>
+    <tr class="frag"><td><code>noneMatch(p)</code></td><td><code>orderLines.stream().noneMatch(l -&gt; l.quantity() &gt; 2)</code></td><td><code>true</code></td></tr>
+    <tr class="frag"><td><code>reduce(identity, acc)</code></td><td><code>orderLines.stream().map(OrderLine::total).reduce(0.0, Double::sum)</code></td><td><code>39.0</code></td></tr>
+    <tr class="frag"><td><code>reduce(acc)</code></td><td><code>orderLines.stream().map(OrderLine::total).reduce(Double::max)</code></td><td><code>Optional[6.0]</code></td></tr>
+  </table>
+  <div class="gap"></div>
+  <ul class="small">
+    <li class="frag"><code>anyMatch</code> stops at the first hit; <code>allMatch</code> and <code>noneMatch</code> stop at the first miss. On an <strong>empty</strong> stream: <code>false</code>, <code>true</code>, <code>true</code> ("all of nothing" is vacuously true).</li>
+    <li class="frag"><code>findAny()</code> is <code>findFirst()</code> without the promise: prefer <code>findFirst()</code>.</li>
+    <li class="frag"><code>reduce</code> is the general form of <code>sum</code>, <code>max</code> and <code>count</code>, but <code>mapToDouble(&hellip;).sum()</code> is usually better: shorter, and no boxing.</li>
+  </ul>
+</section>
+
+<section class="slide" data-title="Handling an Optional" data-section="Terminal operations">
+  <div class="kicker">Terminal operations &middot; <span class="tag ref">beyond what we run</span></div>
+  <h2>Handling an <code>Optional</code></h2>
+  <p class="small dim" style="margin-bottom:6px"><code>min</code>, <code>max</code>, <code>findFirst</code>, <code>findAny</code>, <code>average</code>, <code>reduce(acc)</code>: the stream may be empty, so you must decide what "nothing" means.</p>
+  <table class="compact">
+    <tr><th style="width:430px">Call</th><th>When empty</th></tr>
+    <tr class="frag"><td><code>orElse(-1)</code></td><td><code>-1</code> (the argument is always evaluated)</td></tr>
+    <tr class="frag"><td><code>orElseGet(() -&gt; -1)</code></td><td><code>-1</code> (the supplier only runs when empty: use it when the fallback is expensive)</td></tr>
+    <tr class="frag"><td><code>orElseThrow(() -&gt; new IllegalStateException(&hellip;))</code></td><td>throws that exception</td></tr>
+    <tr class="frag"><td><code>orElseThrow()</code></td><td>throws <code>NoSuchElementException: No value present</code></td></tr>
+    <tr class="frag"><td><code>ifPresent(consumer)</code></td><td>does nothing</td></tr>
+    <tr class="frag"><td><code>map(f)</code></td><td>stays empty</td></tr>
+  </table>
+  <div class="gap"></div>
+  <div class="callout bad frag"><p class="small"><code>orElse(null)</code> is a smell: it turns the explicit "maybe" back into a <code>null</code> the next reader may forget to check. Choose on purpose: a meaningful default, <code>orElseThrow</code> when absence is a bug, or keep working inside the <code>Optional</code>.</p></div>
+  <aside class="notes">
+    <p><code>Main.java</code> ends <code>max</code>, <code>min</code> and <code>findFirst</code> with <code>.orElse(null)</code> and <code>.orElse(-1)</code>. On the course data that fallback never fires (18 lines, so max and min always find one; findFirst finds the unpaid order 3). The fallbacks only keep the demo short.</p>
+    <pre>orderLines.stream().max(Comparator.comparingDouble(OrderLine::total))
+    .map(OrderLine::articleId).map(Database::getArticle).map(Article::name);   // Optional[Taco]</pre>
+  </aside>
+</section>
+
+<section class="slide" data-title="What is new since Java 8" data-section="Terminal operations">
+  <div class="kicker">Terminal operations &middot; <span class="tag new">modern Java</span></div>
+  <h2>What is new since Java 8</h2>
+  <p class="small dim" style="margin-bottom:6px">The course code is Java 8 style on purpose (IntelliJ's suggestions start from it), but the baseline is Java 25.</p>
+  <table class="compact">
+    <tr><th style="width:190px">Feature</th><th style="width:70px">Since</th><th>Example</th><th style="width:250px">Result</th></tr>
+    <tr class="frag"><td><code>toList()</code></td><td>16</td><td><code>Stream.of("a", null, "b").toList()</code></td><td><code>[a, null, b]</code>, unmodifiable</td></tr>
+    <tr class="frag"><td><code>ofNullable(x)</code></td><td>9</td><td><code>Stream.ofNullable(maybeNull).toList()</code></td><td><code>[]</code> for <code>null</code></td></tr>
+    <tr class="frag"><td><code>iterate(seed, hasNext, next)</code></td><td>9</td><td><code>Stream.iterate(1, n -&gt; n &lt;= 16, n -&gt; n * 2).toList()</code></td><td><code>[1, 2, 4, 8, 16]</code></td></tr>
+    <tr class="frag"><td><code>takeWhile</code> / <code>dropWhile</code></td><td>9</td><td><code>names.stream().takeWhile(n -&gt; n.compareTo("D") &lt; 0)</code></td><td><code>[Apple, Beer, Candy, Chicken, Coffee]</code></td></tr>
+    <tr class="frag"><td><code>Collectors.teeing</code></td><td>12</td><td>two collectors, one pass</td><td><code>3 paid / 2 unpaid</code></td></tr>
+    <tr class="frag"><td><code>mapMulti</code></td><td>16</td><td><code>Stream.of(1,2,3).&lt;Integer&gt;mapMulti(&hellip;)</code></td><td><code>[1, 10, 3, 30]</code></td></tr>
+    <tr class="frag"><td>unnamed lambda parameter <code>_</code></td><td>22</td><td><code>Stream.of(1, 2).map(_ -&gt; "x").toList()</code></td><td><code>[x, x]</code></td></tr>
+    <tr class="frag"><td><strong>Gatherers</strong></td><td>24</td><td>custom <em>intermediate</em> operations</td><td>next slide</td></tr>
+  </table>
+  <aside class="notes">
+    <p><code>takeWhile</code> and <code>dropWhile</code> are not <code>filter</code>: they stop looking at the first element that fails. Use them only when the order of the stream means something. <code>mapMulti</code> is mostly a performance tool for small fan-outs; <code>flatMap</code> stays the readable default. The <code>&lt;Integer&gt;</code> before <code>mapMulti</code> is a type witness. The unnamed variable <code>_</code> is final since Java 22; IntelliJ does not suggest it, you choose it.</p>
+  </aside>
+</section>
+
+<section class="slide" data-title="Gatherers (Java 24)" data-section="Terminal operations">
+  <div class="kicker">Terminal operations &middot; <span class="tag new">Java 24</span></div>
+  <h2>Gatherers: custom intermediate operations</h2>
+  <div class="callout">
+    <p class="small">A collector can only <em>end</em> a pipeline; a gatherer is an <strong>intermediate</strong> operation, so the stream goes on. Final since Java 24: on JDK 25 no <code>--enable-preview</code>. Ideal for operations that look at more than one element: windows, running totals.</p>
+  </div>
+  <table class="compact">
+    <tr><th style="width:170px">Gatherer</th><th>Example</th><th style="width:420px">Result</th></tr>
+    <tr class="frag"><td><code>windowFixed(n)</code></td><td><code>names.stream().gather(Gatherers.windowFixed(3)).toList()</code></td><td><code>[[Apple, Beer, Candy], [Chicken, Coffee, Donuts], [Ice Cream, Pineapple, Pizza], [Taco]]</code></td></tr>
+    <tr class="frag"><td><code>windowSliding(n)</code></td><td><code>names.stream().limit(4).gather(Gatherers.windowSliding(2)).toList()</code></td><td><code>[[Apple, Beer], [Beer, Candy], [Candy, Chicken]]</code></td></tr>
+    <tr class="frag"><td><code>scan(init, f)</code></td><td><code>Stream.of(1,2,3,4).gather(Gatherers.scan(() -&gt; 0, Integer::sum)).toList()</code></td><td><code>[1, 3, 6, 10]</code></td></tr>
+    <tr class="frag"><td><code>fold(init, f)</code></td><td><code>Stream.of(1,2,3,4).gather(Gatherers.fold(() -&gt; 0, Integer::sum)).toList()</code></td><td><code>[10]</code></td></tr>
+  </table>
+  <div class="takeaway frag"><code>scan</code> on the order totals gives the running revenue <code>[6.7, 20.5, 27.1, 33.5, 39.0]</code>: the last value is the <code>39.0</code> that <code>sum()</code> returns.</div>
+</section>
+
+<section class="slide" data-title="Terminal operations: takeaways" data-section="Terminal operations">
+  <div class="kicker">Terminal operations</div>
+  <h2>Key takeaways</h2>
+  <ul style="font-size:23px">
+    <li>A terminal operation starts the pipeline; without one <strong>nothing runs</strong>.</li>
+    <li>Prefer <code>.toList()</code> unless you need a mutable list or want <code>null</code> rejected.</li>
+    <li>Never rely on the order of a <code>Set</code> (or <code>Map</code>) when printing or comparing: sort first.</li>
+    <li><code>findFirst()</code> and other short-circuiting operations can stop the pipeline early.</li>
+    <li><code>groupingBy</code> &rarr; <code>Map&lt;key, List&gt;</code>; <code>partitioningBy</code> always has exactly two keys; <code>toMap</code> fails on duplicate keys without a merge function.</li>
+    <li><code>reduce</code> is the general fold, but <code>sum()</code> is usually better.</li>
+    <li>An <code>Optional</code> says "maybe nothing": pick a default, throw, or keep mapping. <code>orElse(null)</code> hides the problem again.</li>
+    <li>Gatherers (final in Java 24): windows, running totals and folds that collectors cannot express.</li>
+  </ul>
+</section>
+
+<!-- =================================================================== -->
+<!-- PITFALLS                                                            -->
+<!-- =================================================================== -->
+
+<section class="slide section" data-title="Pitfalls" data-section="Pitfalls">
+  <div class="num">5</div>
+  <h1>Pitfalls</h1>
+  <div class="sub">This code is broken <em>on purpose</em>. Do not fix it: run it, watch it, understand it.</div>
+</section>
+
+<section class="slide" data-title="Endless streams" data-section="Pitfalls">
+  <div class="kicker">Pitfall &middot; <span class="tag bad">broken on purpose</span> &middot; <span class="tag run">run Main</span></div>
+  <h2>Endless streams</h2>
+  <div class="cols two">
+    <div>
+      <div class="codelabel">Part 1</div>
+      <script type="text/x-java" data-size="sm">
+        IntStream.iterate(0, i -> (i + 1) % 2)
+                .forEach(System.out::println);
+      </script>
+      <div class="codelabel bad frag">Part 2: looks safe because of <code>limit(10)</code></div>
+      <script type="text/x-java" data-size="sm" data-frag>
+        IntStream.iterate(0, i -> (i + 1) % 2)
+                .distinct()                   //>
+                .limit(10)                    //>
+                .forEach(System.out::println);
+      </script>
+    </div>
+    <div class="small">
+      <div class="callout bad frag"><p><strong>1.</strong> A never-ending <code>0 1 0 1 0 1 &hellip;</code>. After 10 s the lesson stops <em>waiting</em>, but the pipeline keeps running in the background.</p></div>
+      <div class="callout bad frag"><p><strong>2.</strong> Prints <code>0 1</code> and then <strong>hangs</strong>, while the first pipeline is still flooding the console.</p></div>
+      <div class="callout warn frag"><p>The output is huge and the program does <strong>not</strong> stop by itself: press the red <strong>Stop</strong> button in IntelliJ.</p></div>
+    </div>
+  </div>
+</section>
+
+<section class="slide" data-title="Endless streams: why and how to fix" data-section="Pitfalls">
+  <div class="kicker">Pitfall &middot; Endless streams</div>
+  <h2>Why it goes wrong, and how to fix it</h2>
+  <div class="cols two">
+    <div>
+      <h3>Why</h3>
+      <ul class="small">
+        <li class="frag"><code>iterate(seed, next)</code> has no end. Only a <strong>short-circuiting</strong> operation (<code>limit</code>, <code>findFirst</code>, <code>takeWhile</code>, <code>anyMatch</code>&hellip;) can end it.</li>
+        <li class="frag">The timeout only stops <em>waiting</em>: <code>forEach</code> never checks for interruption and the executor is never shut down.</li>
+        <li class="frag"><code>distinct()</code> before <code>limit(10)</code>: the stream only ever holds two distinct values, so after two elements nothing passes and <code>limit</code> waits for ten that never arrive.</li>
+      </ul>
+    </div>
+    <div>
+      <h3>Fix</h3>
+      <script type="text/x-java" data-size="xs" data-frag>
+        // 1. limit BEFORE distinct: prints 0 1
+        IntStream.iterate(0, i -> (i + 1) % 2)
+                .limit(10).distinct()
+                .forEach(System.out::println);
+
+        // 2. give the stream an end condition
+        IntStream.iterate(0, i -> i < 10, i -> i + 1)
+      </script>
+      <div class="callout warn frag"><p class="small"><code>takeWhile(i -&gt; i &lt; 10)</code> would <strong>not</strong> help here: on <code>0 1 0 1 &hellip;</code> the condition is always true.</p></div>
+    </div>
+  </div>
+  <div class="takeaway frag">Infinite streams need a short-circuiting operation, and the <strong>order</strong> decides whether it can do its job.</div>
+</section>
+
+<section class="slide" data-title="The order of operations matters" data-section="Pitfalls">
+  <div class="kicker">Pitfall &middot; <span class="tag run">run Main</span></div>
+  <h2><code>limit</code> and <code>skip</code>: guess first</h2>
+  <script type="text/x-java" data-size="sm">
+    IntStream.iterate(0, i -> i + 1)
+            .limit(10)
+            .skip(5)
+            .forEach(System.out::println);
+  </script>
+  <p class="small"><strong>How many numbers does it print?</strong> <span class="dim">Guess, then run it.</span></p>
+  <div class="frag">
+    <div class="rowlabel"><code>limit(10).skip(5)</code>: take the first 10 (0..9), then drop the first 5 &rarr; <strong>5 numbers</strong></div>
+    <div class="boxes" data-from="0" data-to="14" data-keep="5-9" data-drop="0-4" data-gone="10-14"></div>
+  </div>
+  <div class="frag">
+    <div class="rowlabel"><code>skip(5).limit(10)</code>: drop the first 5, then take 10 (5..14) &rarr; <strong>10 numbers</strong></div>
+    <div class="boxes" data-from="0" data-to="14" data-keep="5-14" data-drop="0-4"></div>
+  </div>
+  <div class="takeaway frag">Each step only sees what the previous step passes on. Changing the order of <code>filter</code>, <code>map</code>, <code>distinct</code>, <code>limit</code> and <code>skip</code> can change the <em>result</em>, not only the speed.</div>
+</section>
+
+<section class="slide" data-title="N+1: a call hiding in a lambda" data-section="Pitfalls">
+  <div class="kicker">Pitfall &middot; <span class="tag bad">slow on purpose</span> &middot; <span class="tag run">run Main (~40 s)</span></div>
+  <h2>Calling a service inside a loop or stream</h2>
+  <div class="cols two">
+    <div>
+      <div class="codelabel bad">N+1: one slow call per line</div>
+      <script type="text/x-java" data-size="xs">
+        Database.orderLines.stream()
+            .map(orderLine -> new OrderLineDTO(
+                Database.getArticle(orderLine.articleId()), //>
+                orderLine.total()))
+            .map(Objects::toString)
+            .forEach(System.out::println);
+      </script>
+      <div class="codelabel good frag">Bulk first, then work in memory</div>
+      <script type="text/x-java" data-size="xs" data-frag>
+        Map<Integer, Article> articles = Database.getArticles(); //>
+        Database.orderLines.stream()
+            .map(orderLine -> new OrderLineDTO(
+                articles.get(orderLine.articleId()),
+                orderLine.total()))
+            .map(Objects::toString)
+            .forEach(System.out::println);
+      </script>
+    </div>
+    <div class="small">
+      <p><code>Database.getArticle(id)</code> pretends to be a remote call (<strong>100 ms</strong>). 18 order lines = <strong>18 calls</strong> per run. The bulk variant makes <strong>one</strong> call (300 ms) and uses a <code>Map</code>.</p>
+      <p class="frag">That is the <em>N+1 problem</em>: one call to get the lines, plus N calls to get the details.</p>
+      <div class="callout warn frag"><p>A <code>for</code> loop and a stream are <strong>equally slow</strong> here. The stream only makes it harder to <em>notice</em>, because the call hides inside a lambda.</p></div>
+    </div>
+  </div>
+</section>
+
+<section class="slide" data-title="N+1: the timings" data-section="Pitfalls">
+  <div class="kicker">Pitfall &middot; N+1</div>
+  <h2>Four timings, one ratio</h2>
+  <p class="small dim">Each variant runs the same work 10 times. Measured on JDK 25, Apple silicon. The absolute numbers vary per machine, the ratio does not.</p>
+  <div style="margin-top:14px; font-size:20px">
+    <div class="frag" style="margin-bottom:16px">
+      <div>fetchArticleInForLoop <span class="dim">~18 700 ms</span></div>
+      <div style="height:26px; width:100%; background:var(--bad); border-radius:6px"></div>
+    </div>
+    <div class="frag" style="margin-bottom:16px">
+      <div>fetchArticleInStream <span class="dim">~18 700 ms</span></div>
+      <div style="height:26px; width:100%; background:var(--bad); border-radius:6px"></div>
+    </div>
+    <div class="frag" style="margin-bottom:16px">
+      <div>fetchArticleFirst (loop) <span class="dim">~3 050 ms</span></div>
+      <div style="height:26px; width:16.3%; background:var(--good); border-radius:6px"></div>
+    </div>
+    <div class="frag">
+      <div>fetchArticleFirst (stream) <span class="dim">~3 050 ms</span></div>
+      <div style="height:26px; width:16.3%; background:var(--good); border-radius:6px"></div>
+    </div>
+  </div>
+  <div class="takeaway frag">Never call a database, REST service or any slow method <em>per element</em> inside <code>map</code>, <code>filter</code> or a loop body if you can fetch in bulk first. About <strong>6x</strong> faster.</div>
+</section>
+
+<!-- =================================================================== -->
+<!-- EXERCISES                                                           -->
+<!-- =================================================================== -->
+
+<section class="slide section" data-title="Exercises" data-section="Exercises">
+  <div class="num">6</div>
+  <h1>Exercises</h1>
+  <div class="sub">Practice makes perfect. Implement the methods; <code>CourseTests</code> tell you when you are done.</div>
+</section>
+
+<section class="slide" data-title="Exercise 1: filter customers" data-section="Exercises">
+  <div class="kicker">Exercise 1 &middot; <span class="tag run">JUnit</span></div>
+  <h2>Filter customers</h2>
+  <p class="small">Open <code>src/Exercise1.java</code>. Each method returns an empty list. Matching is <strong>case-insensitive</strong>.</p>
+  <table>
+    <tr><th>Method</th><th>Customers whose &hellip;</th></tr>
+    <tr class="frag"><td><code>listOfAllCustomersWhereLastNameContainsE</code></td><td><strong>last name</strong> contains <code>e</code></td></tr>
+    <tr class="frag"><td><code>listOfAllCustomersWhereLastNameContainsEAndNameContainsL</code></td><td>last name contains <code>e</code> <strong>and</strong> first name contains <code>l</code></td></tr>
+    <tr class="frag"><td><code>listOfAllCustomersWhereAnyFieldContainsO</code></td><td>first name <strong>or</strong> last name contains <code>o</code></td></tr>
+  </table>
+  <div class="gap"></div>
+  <div class="callout frag"><p class="small">Done when all three tests are green. A test failure shows which customers are missing or unexpected.</p></div>
+  <div class="takeaway frag">A <code>filter</code> keeps what matches, and a condition can combine tests with <code>&amp;&amp;</code> and <code>||</code>. Lowercase the text before you compare.</div>
+</section>
+
+<section class="slide" data-title="Exercise 2: names in one list" data-section="Exercises">
+  <div class="kicker">Exercise 2 &middot; <span class="tag run">JUnit</span></div>
+  <h2>Names in one list</h2>
+  <p>Open <code>src/Task.java</code> and complete <code>returnAllCustomerNamesAndArticlesNames</code>.</p>
+  <p>Return <strong>one list of strings</strong>: all customers as <code>"firstname lastname"</code> and all articles by <code>name</code>, in any order.</p>
+  <div class="card frag">
+    <p class="small" style="margin:0">Customers <code>John Doe</code>, <code>Jane Doe</code> and articles <code>Coffee</code>, <code>Pizza</code> give<br>
+    <code>["John Doe", "Jane Doe", "Coffee", "Pizza"]</code> (any order).</p>
+  </div>
+  <div class="gap"></div>
+  <div class="callout frag"><p class="small">Green when the list has <strong>44</strong> entries (34 customers + 10 articles) and contains e.g. <code>"John Doe"</code>, <code>"Jente Sondervorst"</code>, <code>"Elinor O'Quinn"</code>, <code>"Coffee"</code>, <code>"Ice Cream"</code>.</p></div>
+  <div class="takeaway frag"><code>map</code> turns different element types into one common type. Two streams of the same type can be combined into one result.</div>
+</section>
+
+<section class="slide" data-title="Exercise 3: unique article names" data-section="Exercises">
+  <div class="kicker">Exercise 3 &middot; <span class="tag run">JUnit</span></div>
+  <h2>Unique article names in unpaid orders</h2>
+  <p>Open <code>src/Task.java</code> (it returns <code>null</code>) and complete <code>returnAllArticleNamesInUnpaidOrders</code>.</p>
+  <p>Return the <strong>names</strong> of all articles that appear in <strong>unpaid</strong> orders. Every name only <strong>once</strong>, in any order.</p>
+  <div class="callout frag"><p class="small">Order lines only contain an <code>articleId</code>: use the <code>articles</code> list to look up the name.</p></div>
+  <div class="callout good frag"><p class="small">On the sample <code>Database</code> the test is green when the list holds exactly four names: <code>Chicken</code>, <code>Ice Cream</code>, <code>Coffee</code> and <code>Taco</code>.</p></div>
+  <div class="takeaway frag">A pipeline can filter, flatten nested data and look up related data by id. A result can be made unique.</div>
+</section>
+
+<!-- =================================================================== -->
+<!-- WRAP UP                                                             -->
+<!-- =================================================================== -->
+
+<section class="slide" data-title="Recap" data-section="Wrap up">
+  <div class="kicker">Wrap up</div>
+  <h2>What to remember</h2>
+  <div class="pipe" style="margin-bottom:14px">
+    <div class="stage src"><h3>Source</h3><p>collection, values, range</p></div>
+    <div class="arrow">&rarr;</div>
+    <div class="stage mid"><h3>Intermediate</h3><p>lazy, chainable, order matters</p></div>
+    <div class="arrow">&rarr;</div>
+    <div class="stage end"><h3>Terminal</h3><p>starts the pipeline</p></div>
+  </div>
+  <ul style="font-size:25px">
+    <li class="frag">Reading a pipeline <strong>top to bottom</strong> tells you what each step receives.</li>
+    <li class="frag">Infinite streams need a <strong>short-circuiting</strong> operation, in the right place.</li>
+    <li class="frag">Fetch in <strong>bulk</strong> before the stream; keep lambdas pure and in-memory.</li>
+    <li class="frag">Let IntelliJ's suggestions teach you, and debug with breakpoints or <em>Trace Current Stream Chain</em>.</li>
+  </ul>
+</section>
+
+<section class="slide title" data-title="Thank you" data-section="Wrap up">
+  <div class="kicker">Questions?</div>
+  <h1>Thank you</h1>
+  <div class="sub">Now go make those tests green.</div>
+</section>
+
+</div><!-- /#stage -->
+
+<div id="crumb"></div>
+<div id="counter"></div>
+
+<div id="notes"><div class="nt">Presenter notes</div><div class="body"></div></div>
+
+<div id="overview"><h2>Slide overview <span class="dim" style="font-size:16px">click a slide to jump &middot; Esc to close</span></h2><div class="list"></div></div>
+
+<div id="help">
+  <h2>Keyboard shortcuts <span class="dim" style="font-size:16px">Esc to close</span></h2>
+  <table>
+    <tr><td><kbd>&rarr;</kbd> <kbd>Space</kbd> <kbd>PgDn</kbd></td><td>next step / slide</td></tr>
+    <tr><td><kbd>&larr;</kbd> <kbd>PgUp</kbd></td><td>previous step / slide</td></tr>
+    <tr><td><kbd>Home</kbd> <kbd>End</kbd></td><td>first / last slide</td></tr>
+    <tr><td><kbd>O</kbd></td><td>slide overview</td></tr>
+    <tr><td><kbd>N</kbd></td><td>presenter notes</td></tr>
+    <tr><td><kbd>F</kbd></td><td>fullscreen</td></tr>
+    <tr><td><kbd>T</kbd></td><td>dark / light theme</td></tr>
+    <tr><td><kbd>?</kbd></td><td>this help</td></tr>
+  </table>
+  <p class="dim" style="margin-top:20px; font-size:16px">Click the right half of the screen to go forward, the left half to go back. The URL hash (<code>#12</code>) is the slide number. Print to PDF gives one slide per page with everything revealed.</p>
+</div>
+
+<script src="js/presentation.js"></script>
+</body>
+</html>

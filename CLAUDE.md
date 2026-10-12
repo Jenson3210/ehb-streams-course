@@ -42,6 +42,11 @@ task folder (no sync script, by decision). There are 6 distinct versions of `Dat
 keeps its copy in `test/`; the Introduction's `Order`/`OrderLine` have no `total()`). A change to the shared domain or data must be
 repeated in every copy; check with `md5sum` before assuming they are equal.
 
+**Presentation:** `presentation/` is a standalone HTML/CSS/JS slide deck of the course (open `presentation/index.html`, no build, works
+offline). It is not part of the course hierarchy and has no `src/` folder, so Gradle ignores it. Its slides copy text and results from
+the `task.md` files and `Main.java` demos: when a lesson changes, update the matching slide. Solutions of hands-on tasks go in
+`<aside class="notes">` only, never on a slide. See `presentation/README.md` for the slide markup.
+
 **Domain:** `Article(id, name)`, `Customer(id, name, lastName)`, `Order(id, customerId, paid, orderLines)`,
 `OrderLine(articleId, quantity, price)` + `total()`. Customers exist only in the exercises.
 

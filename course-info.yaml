@@ -40,4 +40,10 @@ additional_files:
     is_binary: true
   - name: gradle/wrapper/gradle-wrapper.properties
   - name: CLAUDE.md
+  - name: presentation/Mastering Java Streams API.pptx
+    is_binary: true
+  - name: presentation/index.html
+  - name: presentation/apply_theme.js
+  - name: presentation/README.md
+  - name: README.md
 yaml_version: 6
