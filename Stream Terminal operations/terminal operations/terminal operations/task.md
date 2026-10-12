@@ -4,7 +4,7 @@
   - averagingDouble 
   - summingDouble 
   - …
-- toList --> as of JAVA 17 
+- toList --> as of Java 16 (`Stream.toList()`) 
 - max, min(Comparators…)
   - comparingDouble 
   - comparingInt

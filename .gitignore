@@ -7,3 +7,5 @@ build/
 *.ipr
 /.coursecreator/
 */build/
+out/
+*/out/
